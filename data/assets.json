@@ -1,0 +1,62 @@
+[
+  {
+    "id": "R17",
+    "type": "road",
+    "name": "Coastal Access Road R17",
+    "lat": 20.31,
+    "lon": 86.52,
+    "criticality": 90,
+    "capacity": 100,
+    "dependencies": ["PHC-P04", "S03", "V03"]
+  },
+  {
+    "id": "PHC-P04",
+    "type": "phc",
+    "name": "Primary Health Centre P04",
+    "lat": 20.315,
+    "lon": 86.525,
+    "criticality": 95,
+    "capacity": 120,
+    "dependencies": ["R17", "S04"]
+  },
+  {
+    "id": "S03",
+    "type": "shelter",
+    "name": "Cyclone Shelter S03",
+    "lat": 20.305,
+    "lon": 86.515,
+    "criticality": 88,
+    "capacity": 500,
+    "dependencies": ["R17"]
+  },
+  {
+    "id": "V03",
+    "type": "village",
+    "name": "Coastal Village V03",
+    "lat": 20.32,
+    "lon": 86.53,
+    "criticality": 82,
+    "population": 2400,
+    "dependencies": ["R17", "PHC-P04"]
+  },
+  {
+    "id": "PWR-S04",
+    "type": "power_substation",
+    "name": "Power Substation S04",
+    "lat": 20.325,
+    "lon": 86.54,
+    "criticality": 92,
+    "capacity": 1000,
+    "dependencies": ["R21"]
+  },
+  {
+    "id": "R21",
+    "type": "road",
+    "name": "Alternate Route R21",
+    "lat": 20.34,
+    "lon": 86.55,
+    "criticality": 75,
+    "capacity": 80,
+    "dependencies": ["PWR-S04"]
+  }
+]

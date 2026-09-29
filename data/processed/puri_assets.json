@@ -1,0 +1,920 @@
+{
+  "area": "Puri city-area",
+  "source": "OpenStreetMap",
+  "asset_count": 51,
+  "assets": [
+    {
+      "id": "OSM-1051793897",
+      "type": "police",
+      "name": "Sea Beach Police Station",
+      "lat": 19.7970994,
+      "lon": 85.8258784,
+      "source": "OpenStreetMap",
+      "source_type": "real_public_data",
+      "osm_id": 1051793897,
+      "tags": {
+        "amenity": "police",
+        "name": "Sea Beach Police Station"
+      }
+    },
+    {
+      "id": "OSM-1051794049",
+      "type": "fuel",
+      "name": "Grand Motor Service Station",
+      "lat": 19.8128992,
+      "lon": 85.8303881,
+      "source": "OpenStreetMap",
+      "source_type": "real_public_data",
+      "osm_id": 1051794049,
+      "tags": {
+        "addr:city": "Puri",
+        "addr:district": "Puri",
+        "amenity": "fuel",
+        "brand": "Bharat Petroleum",
+        "brand:wikidata": "Q854826",
+        "fuel:Petrol": "yes",
+        "fuel:diesel": "yes",
+        "name": "Grand Motor Service Station",
+        "operator": "Bharat Petroleum"
+      }
+    },
+    {
+      "id": "OSM-1051795053",
+      "type": "police",
+      "name": "Puri Town Police Station",
+      "lat": 19.8087658,
+      "lon": 85.8228135,
+      "source": "OpenStreetMap",
+      "source_type": "real_public_data",
+      "osm_id": 1051795053,
+      "tags": {
+        "amenity": "police",
+        "name": "Puri Town Police Station"
+      }
+    },
+    {
+      "id": "OSM-1051795880",
+      "type": "fuel",
+      "name": "Indian Oil",
+      "lat": 19.8244931,
+      "lon": 85.8575498,
+      "source": "OpenStreetMap",
+      "source_type": "real_public_data",
+      "osm_id": 1051795880,
+      "tags": {
+        "addr:city": "Puri",
+        "addr:district": "Puri",
+        "amenity": "fuel",
+        "brand": "Indian Oil",
+        "brand:wikidata": "Q1289348",
+        "compressed_air": "yes",
+        "fuel:Petrol": "yes",
+        "fuel:diesel": "yes",
+        "name": "Indian Oil"
+      }
+    },
+    {
+      "id": "OSM-1051796516",
+      "type": "bus_station",
+      "name": "Puri Bus Station",
+      "lat": 19.8147662,
+      "lon": 85.8391133,
+      "source": "OpenStreetMap",
+      "source_type": "real_public_data",
+      "osm_id": 1051796516,
+      "tags": {
+        "amenity": "bus_station",
+        "bus": "yes",
+        "name": "Puri Bus Station",
+        "public_transport": "station"
+      }
+    },
+    {
+      "id": "OSM-1051796615",
+      "type": "bus_station",
+      "name": "Puri Local Bus Stand",
+      "lat": 19.8157012,
+      "lon": 85.8379388,
+      "source": "OpenStreetMap",
+      "source_type": "real_public_data",
+      "osm_id": 1051796615,
+      "tags": {
+        "amenity": "bus_station",
+        "bus": "yes",
+        "name": "Puri Local Bus Stand",
+        "public_transport": "station"
+      }
+    },
+    {
+      "id": "OSM-2392178700",
+      "type": "power_tower",
+      "name": "Unnamed power_tower",
+      "lat": 19.8246648,
+      "lon": 85.8547967,
+      "source": "OpenStreetMap",
+      "source_type": "real_public_data",
+      "osm_id": 2392178700,
+      "tags": {
+        "power": "tower"
+      }
+    },
+    {
+      "id": "OSM-2392178701",
+      "type": "power_tower",
+      "name": "Unnamed power_tower",
+      "lat": 19.8260432,
+      "lon": 85.8540076,
+      "source": "OpenStreetMap",
+      "source_type": "real_public_data",
+      "osm_id": 2392178701,
+      "tags": {
+        "power": "tower"
+      }
+    },
+    {
+      "id": "OSM-2392178702",
+      "type": "power_tower",
+      "name": "Unnamed power_tower",
+      "lat": 19.8282771,
+      "lon": 85.8552468,
+      "source": "OpenStreetMap",
+      "source_type": "real_public_data",
+      "osm_id": 2392178702,
+      "tags": {
+        "power": "tower"
+      }
+    },
+    {
+      "id": "OSM-2392178703",
+      "type": "power_tower",
+      "name": "Unnamed power_tower",
+      "lat": 19.8305766,
+      "lon": 85.8567689,
+      "source": "OpenStreetMap",
+      "source_type": "real_public_data",
+      "osm_id": 2392178703,
+      "tags": {
+        "power": "tower"
+      }
+    },
+    {
+      "id": "OSM-2392178704",
+      "type": "power_tower",
+      "name": "Unnamed power_tower",
+      "lat": 19.8329615,
+      "lon": 85.8583938,
+      "source": "OpenStreetMap",
+      "source_type": "real_public_data",
+      "osm_id": 2392178704,
+      "tags": {
+        "power": "tower"
+      }
+    },
+    {
+      "id": "OSM-2392178705",
+      "type": "power_tower",
+      "name": "Unnamed power_tower",
+      "lat": 19.8353804,
+      "lon": 85.8585725,
+      "source": "OpenStreetMap",
+      "source_type": "real_public_data",
+      "osm_id": 2392178705,
+      "tags": {
+        "power": "tower"
+      }
+    },
+    {
+      "id": "OSM-2392178706",
+      "type": "power_tower",
+      "name": "Unnamed power_tower",
+      "lat": 19.837049,
+      "lon": 85.8563244,
+      "source": "OpenStreetMap",
+      "source_type": "real_public_data",
+      "osm_id": 2392178706,
+      "tags": {
+        "power": "tower"
+      }
+    },
+    {
+      "id": "OSM-2392178707",
+      "type": "power_tower",
+      "name": "Unnamed power_tower",
+      "lat": 19.8385495,
+      "lon": 85.8543038,
+      "source": "OpenStreetMap",
+      "source_type": "real_public_data",
+      "osm_id": 2392178707,
+      "tags": {
+        "power": "tower"
+      }
+    },
+    {
+      "id": "OSM-4183385009",
+      "type": "school",
+      "name": "Unnamed school",
+      "lat": 19.805331,
+      "lon": 85.8432892,
+      "source": "OpenStreetMap",
+      "source_type": "real_public_data",
+      "osm_id": 4183385009,
+      "tags": {
+        "amenity": "school"
+      }
+    },
+    {
+      "id": "OSM-6161309638",
+      "type": "fuel",
+      "name": "Bata Mangala Petrol Station",
+      "lat": 19.838651,
+      "lon": 85.8367135,
+      "source": "OpenStreetMap",
+      "source_type": "real_public_data",
+      "osm_id": 6161309638,
+      "tags": {
+        "addr:city": "Puri",
+        "addr:district": "Puri",
+        "amenity": "fuel",
+        "brand": "Hindustan Petroleum",
+        "brand:wikidata": "Q1619375",
+        "fuel:Petrol": "yes",
+        "fuel:diesel": "yes",
+        "name": "Bata Mangala Petrol Station",
+        "official_name": "Hindustan Petroleum",
+        "payment:card": "yes",
+        "payment:cash": "yes",
+        "short_name": "HP"
+      }
+    },
+    {
+      "id": "OSM-6227097056",
+      "type": "power_tower",
+      "name": "Unnamed power_tower",
+      "lat": 19.8234594,
+      "lon": 85.8550429,
+      "source": "OpenStreetMap",
+      "source_type": "real_public_data",
+      "osm_id": 6227097056,
+      "tags": {
+        "power": "tower"
+      }
+    },
+    {
+      "id": "OSM-6227097057",
+      "type": "power_tower",
+      "name": "Unnamed power_tower",
+      "lat": 19.822869,
+      "lon": 85.8582401,
+      "source": "OpenStreetMap",
+      "source_type": "real_public_data",
+      "osm_id": 6227097057,
+      "tags": {
+        "power": "tower"
+      }
+    },
+    {
+      "id": "OSM-6670184085",
+      "type": "bus_station",
+      "name": "Bus to Puri station",
+      "lat": 19.7933187,
+      "lon": 85.8186734,
+      "source": "OpenStreetMap",
+      "source_type": "real_public_data",
+      "osm_id": 6670184085,
+      "tags": {
+        "amenity": "bus_station",
+        "bus": "yes",
+        "name": "Bus to Puri station",
+        "public_transport": "station"
+      }
+    },
+    {
+      "id": "OSM-6884898281",
+      "type": "blood_bank",
+      "name": "Aharya Harihar Red Cross Blood Bank",
+      "lat": 19.8145117,
+      "lon": 85.8296397,
+      "source": "OpenStreetMap",
+      "source_type": "real_public_data",
+      "osm_id": 6884898281,
+      "tags": {
+        "addr:city": "Puri",
+        "addr:district": "PURI",
+        "addr:full": "District Head Quarters Hospital, Grand Road",
+        "addr:postcode": "752001",
+        "addr:state": "Odisha",
+        "amenity": "blood_bank",
+        "contact:mobile": "9861067545",
+        "contact:phone": "6752224097",
+        "email": "puribloodbank@yahoo.com",
+        "name": "Aharya Harihar Red Cross Blood Bank",
+        "opening_hours": "24/7",
+        "operator:type": "ngo",
+        "source": "OpenGovernmentData"
+      }
+    },
+    {
+      "id": "OSM-7051182992",
+      "type": "hospital",
+      "name": "Swapu Care",
+      "lat": 19.8017351,
+      "lon": 85.8325204,
+      "source": "OpenStreetMap",
+      "source_type": "real_public_data",
+      "osm_id": 7051182992,
+      "tags": {
+        "addr:district": "Puri",
+        "addr:full": "VIP Road",
+        "addr:postcode": "752001",
+        "addr:state": "Odisha",
+        "amenity": "hospital",
+        "healthcare": "hospital",
+        "name": "Swapu Care",
+        "source": "OpenGovernmentData"
+      }
+    },
+    {
+      "id": "OSM-7053747524",
+      "type": "hospital",
+      "name": "Sanjeevani Hospital (Puri)",
+      "lat": 19.8146852,
+      "lon": 85.8403464,
+      "source": "OpenStreetMap",
+      "source_type": "real_public_data",
+      "osm_id": 7053747524,
+      "tags": {
+        "addr:district": "Puri",
+        "addr:full": "Chaitanya Vihar, Bus Stand",
+        "addr:postcode": "752001",
+        "addr:state": "Odisha",
+        "amenity": "hospital",
+        "name": "Sanjeevani Hospital (Puri)",
+        "source": "OpenGovernmentData"
+      }
+    },
+    {
+      "id": "OSM-7078980391",
+      "type": "hospital",
+      "name": "District Headquarter Hospital ,Puri",
+      "lat": 19.8142712,
+      "lon": 85.8299503,
+      "source": "OpenStreetMap",
+      "source_type": "real_public_data",
+      "osm_id": 7078980391,
+      "tags": {
+        "addr:district": "Puri",
+        "addr:full": "Baliput,Puri",
+        "addr:postcode": "752001",
+        "addr:state": "Odisha",
+        "amenity": "hospital",
+        "name": "District Headquarter Hospital ,Puri",
+        "source": "OpenGovernmentData"
+      }
+    },
+    {
+      "id": "OSM-7079200342",
+      "type": "hospital",
+      "name": "I.D.H, Puri",
+      "lat": 19.8112056,
+      "lon": 85.8352343,
+      "source": "OpenStreetMap",
+      "source_type": "real_public_data",
+      "osm_id": 7079200342,
+      "tags": {
+        "addr:district": "Puri",
+        "addr:full": "Puri",
+        "addr:postcode": "752001",
+        "addr:state": "Odisha",
+        "addr:subdistrict": "Puri (M) P.S.",
+        "amenity": "hospital",
+        "description": "Civil Hospital/General Hospital",
+        "healthcare": "hospital",
+        "name": "I.D.H, Puri",
+        "source": "OpenGovernmentData"
+      }
+    },
+    {
+      "id": "OSM-7079268126",
+      "type": "hospital",
+      "name": "Government Hospital, Puri",
+      "lat": 19.8144032,
+      "lon": 85.8295966,
+      "source": "OpenStreetMap",
+      "source_type": "real_public_data",
+      "osm_id": 7079268126,
+      "tags": {
+        "addr:district": "Puri",
+        "addr:full": "Government Hospital",
+        "addr:postcode": "752001",
+        "addr:state": "Odisha",
+        "amenity": "hospital",
+        "name": "Government Hospital, Puri",
+        "source": "OpenGovernmentData"
+      }
+    },
+    {
+      "id": "OSM-7079268127",
+      "type": "hospital",
+      "name": "K.D.M.M , Puri",
+      "lat": 19.8050434,
+      "lon": 85.8359869,
+      "source": "OpenStreetMap",
+      "source_type": "real_public_data",
+      "osm_id": 7079268127,
+      "tags": {
+        "addr:district": "Puri",
+        "addr:full": "Railway Station, Ward-25, Station Road,Puri",
+        "addr:postcode": "752001",
+        "addr:state": "Odisha",
+        "amenity": "hospital",
+        "healthcare": "hospital",
+        "name": "K.D.M.M , Puri",
+        "source": "OpenGovernmentData"
+      }
+    },
+    {
+      "id": "OSM-7079268134",
+      "type": "clinic",
+      "name": "Nilachal Nursing Home",
+      "lat": 19.8076253,
+      "lon": 85.8330401,
+      "source": "OpenStreetMap",
+      "source_type": "real_public_data",
+      "osm_id": 7079268134,
+      "tags": {
+        "addr:district": "Puri",
+        "addr:full": "V I P Road",
+        "addr:postcode": "752001",
+        "addr:state": "Odisha",
+        "amenity": "clinic",
+        "healthcare": "clinic",
+        "name": "Nilachal Nursing Home",
+        "source": "OpenGovernmentData"
+      }
+    },
+    {
+      "id": "OSM-7210926185",
+      "type": "clinic",
+      "name": "UPHC, Swargadwar",
+      "lat": 19.8003005,
+      "lon": 85.8185743,
+      "source": "OpenStreetMap",
+      "source_type": "real_public_data",
+      "osm_id": 7210926185,
+      "tags": {
+        "addr:district": "Puri",
+        "addr:full": "Barahi Lane, Bali Sahi, Puri",
+        "addr:postcode": "752001",
+        "addr:state": "Odisha",
+        "amenity": "clinic",
+        "healthcare": "clinic",
+        "name": "UPHC, Swargadwar",
+        "source": "OpenGovernmentData"
+      }
+    },
+    {
+      "id": "OSM-7210929853",
+      "type": "clinic",
+      "name": "Arogyadham Clinic",
+      "lat": 19.8111378,
+      "lon": 85.8304216,
+      "source": "OpenStreetMap",
+      "source_type": "real_public_data",
+      "osm_id": 7210929853,
+      "tags": {
+        "addr:district": "Puri",
+        "addr:full": "Heragohiri Sahi Road, Near Nilakantheswari Temple, Puri",
+        "addr:postcode": "752001",
+        "addr:state": "Odisha",
+        "amenity": "clinic",
+        "healthcare": "clinic",
+        "name": "Arogyadham Clinic",
+        "source": "OpenGovernmentData"
+      }
+    },
+    {
+      "id": "OSM-7212185450",
+      "type": "hospital",
+      "name": "Chandan Hazuri Paediatric Hospital",
+      "lat": 19.8003863,
+      "lon": 85.8331548,
+      "source": "OpenStreetMap",
+      "source_type": "real_public_data",
+      "osm_id": 7212185450,
+      "tags": {
+        "addr:district": "Puri",
+        "addr:full": "City Road, Subash Bose Chhak, Kdmm",
+        "addr:postcode": "752001",
+        "addr:state": "Odisha",
+        "addr:subdistrict": "Puri (M) P.S.",
+        "amenity": "hospital",
+        "healthcare": "hospital",
+        "name": "Chandan Hazuri Paediatric Hospital",
+        "source": "OpenGovernmentData"
+      }
+    },
+    {
+      "id": "OSM-7701568083",
+      "type": "hospital",
+      "name": "Patanjali Hospital",
+      "lat": 19.810904,
+      "lon": 85.825702,
+      "source": "OpenStreetMap",
+      "source_type": "real_public_data",
+      "osm_id": 7701568083,
+      "tags": {
+        "addr:district": "Puri",
+        "addr:full": "Puri",
+        "addr:postcode": "752001",
+        "addr:state": "Odhisa",
+        "amenity": "hospital",
+        "name": "Patanjali Hospital",
+        "source": "Local Knowledge"
+      }
+    },
+    {
+      "id": "OSM-7701568088",
+      "type": "clinic",
+      "name": "Sharada Nursing Home",
+      "lat": 19.8113176,
+      "lon": 85.8256128,
+      "source": "OpenStreetMap",
+      "source_type": "real_public_data",
+      "osm_id": 7701568088,
+      "tags": {
+        "addr:district": "Puri",
+        "addr:full": "Subhadra",
+        "addr:postcode": "752001",
+        "addr:state": "Odhisa",
+        "amenity": "clinic",
+        "healthcare": "clinic",
+        "name": "Sharada Nursing Home",
+        "source": "Local Knowledge"
+      }
+    },
+    {
+      "id": "OSM-7701568091",
+      "type": "hospital",
+      "name": "Kalara Hospital",
+      "lat": 19.8124944,
+      "lon": 85.834597,
+      "source": "OpenStreetMap",
+      "source_type": "real_public_data",
+      "osm_id": 7701568091,
+      "tags": {
+        "addr:district": "Puri",
+        "addr:full": "Red Cross Road, Balikuda Sahi",
+        "addr:postcode": "752002",
+        "addr:state": "Odhisa",
+        "amenity": "hospital",
+        "healthcare": "hospital",
+        "name": "Kalara Hospital",
+        "source": "Local Knowledge"
+      }
+    },
+    {
+      "id": "OSM-7701568096",
+      "type": "clinic",
+      "name": "Girish Chandra Behra Clinic",
+      "lat": 19.811861,
+      "lon": 85.8347967,
+      "source": "OpenStreetMap",
+      "source_type": "real_public_data",
+      "osm_id": 7701568096,
+      "tags": {
+        "addr:district": "Puri",
+        "addr:full": "Red Cross Road, Chari Chaka",
+        "addr:postcode": "752002",
+        "addr:state": "Odhisa",
+        "amenity": "clinic",
+        "healthcare": "clinic",
+        "name": "Girish Chandra Behra Clinic",
+        "source": "Local Knowledge"
+      }
+    },
+    {
+      "id": "OSM-7701568106",
+      "type": "clinic",
+      "name": "Maa Harijana Seka Clinic",
+      "lat": 19.8120735,
+      "lon": 85.8312458,
+      "source": "OpenStreetMap",
+      "source_type": "real_public_data",
+      "osm_id": 7701568106,
+      "tags": {
+        "addr:district": "Puri",
+        "addr:postcode": "752002",
+        "addr:state": "Odhisa",
+        "amenity": "clinic",
+        "healthcare": "clinic",
+        "name": "Maa Harijana Seka Clinic",
+        "source": "Local Knowledge"
+      }
+    },
+    {
+      "id": "OSM-7701568110",
+      "type": "hospital",
+      "name": "E-24 Hospital",
+      "lat": 19.8016875,
+      "lon": 85.8241345,
+      "source": "OpenStreetMap",
+      "source_type": "real_public_data",
+      "osm_id": 7701568110,
+      "tags": {
+        "addr:district": "Puri",
+        "addr:full": "Dolamandap Sahi",
+        "addr:postcode": "752002",
+        "addr:state": "Odhisa",
+        "amenity": "hospital",
+        "healthcare": "hospital",
+        "name": "E-24 Hospital",
+        "source": "Local Knowledge"
+      }
+    },
+    {
+      "id": "OSM-7701568112",
+      "type": "hospital",
+      "name": "Ramamani Multi Speciality Hospital",
+      "lat": 19.8247793,
+      "lon": 85.8527662,
+      "source": "OpenStreetMap",
+      "source_type": "real_public_data",
+      "osm_id": 7701568112,
+      "tags": {
+        "addr:district": "Puri",
+        "addr:full": "Balighat",
+        "addr:postcode": "752002",
+        "addr:state": "Odhisa",
+        "amenity": "hospital",
+        "healthcare": "hospital",
+        "name": "Ramamani Multi Speciality Hospital",
+        "source": "Local Knowledge"
+      }
+    },
+    {
+      "id": "OSM-7701568120",
+      "type": "clinic",
+      "name": "Gupta Clinic",
+      "lat": 19.8171894,
+      "lon": 85.8405834,
+      "source": "OpenStreetMap",
+      "source_type": "real_public_data",
+      "osm_id": 7701568120,
+      "tags": {
+        "addr:district": "Puri",
+        "addr:full": "Sarbodaya Nagar",
+        "addr:postcode": "752002",
+        "addr:state": "Odhisa",
+        "amenity": "clinic",
+        "name": "Gupta Clinic",
+        "source": "Local Knowledge"
+      }
+    },
+    {
+      "id": "OSM-7701568124",
+      "type": "clinic",
+      "name": "Sri Krishna Clinic",
+      "lat": 19.8205404,
+      "lon": 85.8390402,
+      "source": "OpenStreetMap",
+      "source_type": "real_public_data",
+      "osm_id": 7701568124,
+      "tags": {
+        "addr:district": "Puri",
+        "addr:full": "Makubana",
+        "addr:postcode": "752002",
+        "addr:state": "Odhisa",
+        "amenity": "clinic",
+        "name": "Sri Krishna Clinic",
+        "source": "Local Knowledge"
+      }
+    },
+    {
+      "id": "OSM-7701568130",
+      "type": "clinic",
+      "name": "Sarala Pantholab",
+      "lat": 19.8131671,
+      "lon": 85.8319784,
+      "source": "OpenStreetMap",
+      "source_type": "real_public_data",
+      "osm_id": 7701568130,
+      "tags": {
+        "addr:district": "Puri",
+        "addr:full": "Puri",
+        "addr:postcode": "752002",
+        "addr:state": "Odhisa",
+        "amenity": "clinic",
+        "healthcare": "clinic",
+        "name": "Sarala Pantholab",
+        "source": "Local Knowledge"
+      }
+    },
+    {
+      "id": "OSM-7701568135",
+      "type": "clinic",
+      "name": "Sahoo Clinic",
+      "lat": 19.8161689,
+      "lon": 85.8413723,
+      "source": "OpenStreetMap",
+      "source_type": "real_public_data",
+      "osm_id": 7701568135,
+      "tags": {
+        "addr:district": "Puri",
+        "addr:full": "Sarbodaya Nagar",
+        "addr:postcode": "752002",
+        "addr:state": "Odhisa",
+        "amenity": "clinic",
+        "name": "Sahoo Clinic",
+        "source": "Local Knowledge"
+      }
+    },
+    {
+      "id": "OSM-7701568148",
+      "type": "hospital",
+      "name": "Sri Krishna Hospital",
+      "lat": 19.8176939,
+      "lon": 85.8405863,
+      "source": "OpenStreetMap",
+      "source_type": "real_public_data",
+      "osm_id": 7701568148,
+      "tags": {
+        "addr:district": "Puri",
+        "addr:full": "Gundicha Vihar, Sarbodaya Nagar",
+        "addr:postcode": "752002",
+        "addr:state": "Odhisa",
+        "amenity": "hospital",
+        "name": "Sri Krishna Hospital",
+        "source": "Local Knowledge"
+      }
+    },
+    {
+      "id": "OSM-7701568161",
+      "type": "hospital",
+      "name": "Apollo Hospital",
+      "lat": 19.8121172,
+      "lon": 85.8307868,
+      "source": "OpenStreetMap",
+      "source_type": "real_public_data",
+      "osm_id": 7701568161,
+      "tags": {
+        "addr:district": "Puri",
+        "addr:full": "Balagandi",
+        "addr:postcode": "752001",
+        "addr:state": "Odhisa",
+        "amenity": "hospital",
+        "healthcare": "hospital",
+        "name": "Apollo Hospital",
+        "source": "Local Knowledge"
+      }
+    },
+    {
+      "id": "OSM-7701568163",
+      "type": "clinic",
+      "name": "Nandalaya Arogya Ashrama Clinic and Surgic Centre",
+      "lat": 19.812752,
+      "lon": 85.842205,
+      "source": "OpenStreetMap",
+      "source_type": "real_public_data",
+      "osm_id": 7701568163,
+      "tags": {
+        "addr:district": "Puri",
+        "addr:full": "Sarbodaya Nagar",
+        "addr:postcode": "752002",
+        "addr:state": "Odhisa",
+        "amenity": "clinic",
+        "name": "Nandalaya Arogya Ashrama Clinic and Surgic Centre",
+        "source": "Local Knowledge"
+      }
+    },
+    {
+      "id": "OSM-7701568166",
+      "type": "clinic",
+      "name": "Sai Saudamini Nursing Home",
+      "lat": 19.817323,
+      "lon": 85.840601,
+      "source": "OpenStreetMap",
+      "source_type": "real_public_data",
+      "osm_id": 7701568166,
+      "tags": {
+        "addr:district": "Puri",
+        "addr:full": "Harihar Market",
+        "addr:postcode": "752002",
+        "addr:state": "Odhisa",
+        "amenity": "clinic",
+        "name": "Sai Saudamini Nursing Home",
+        "source": "Local Knowledge"
+      }
+    },
+    {
+      "id": "OSM-7701568168",
+      "type": "hospital",
+      "name": "Keya Fertility and Test Tube Baby centre",
+      "lat": 19.823713,
+      "lon": 85.828647,
+      "source": "OpenStreetMap",
+      "source_type": "real_public_data",
+      "osm_id": 7701568168,
+      "tags": {
+        "addr:district": "Puri",
+        "addr:full": "Gopinathpur New Colony Road, Gopinathpur",
+        "addr:postcode": "752002",
+        "addr:state": "Odhisa",
+        "amenity": "hospital",
+        "healthcare": "hospital",
+        "name": "Keya Fertility and Test Tube Baby centre",
+        "source": "Local Knowledge"
+      }
+    },
+    {
+      "id": "OSM-7701568170",
+      "type": "hospital",
+      "name": "Om Sai Eye Care Hospitals",
+      "lat": 19.811252,
+      "lon": 85.829929,
+      "source": "OpenStreetMap",
+      "source_type": "real_public_data",
+      "osm_id": 7701568170,
+      "tags": {
+        "addr:district": "Puri",
+        "addr:full": "Balagandi",
+        "addr:postcode": "752001",
+        "addr:state": "Odhisa",
+        "amenity": "hospital",
+        "healthcare": "hospital",
+        "name": "Om Sai Eye Care Hospitals",
+        "source": "Local Knowledge"
+      }
+    },
+    {
+      "id": "OSM-8073270483",
+      "type": "shelter",
+      "name": "Unnamed shelter",
+      "lat": 19.7966523,
+      "lon": 85.8273623,
+      "source": "OpenStreetMap",
+      "source_type": "real_public_data",
+      "osm_id": 8073270483,
+      "tags": {
+        "amenity": "shelter",
+        "shelter_type": "gazebo"
+      }
+    },
+    {
+      "id": "OSM-13245915108",
+      "type": "pharmacy",
+      "name": "Unnamed pharmacy",
+      "lat": 19.7957679,
+      "lon": 85.8136691,
+      "source": "OpenStreetMap",
+      "source_type": "real_public_data",
+      "osm_id": 13245915108,
+      "tags": {
+        "amenity": "pharmacy",
+        "healthcare": "pharmacy",
+        "shop": "chemist"
+      }
+    },
+    {
+      "id": "OSM-13681289127",
+      "type": "fuel",
+      "name": "Hindustan Gasoline",
+      "lat": 19.8246312,
+      "lon": 85.8538984,
+      "source": "OpenStreetMap",
+      "source_type": "real_public_data",
+      "osm_id": 13681289127,
+      "tags": {
+        "addr:city": "Puri",
+        "addr:district": "Puri",
+        "amenity": "fuel",
+        "brand": "Hindustan Petroleum",
+        "brand:wikidata": "Q1619375",
+        "fuel:Petrol": "yes",
+        "fuel:diesel": "yes",
+        "name": "Hindustan Gasoline",
+        "official_name": "Hindustan Petroleum",
+        "short_name": "HP"
+      }
+    },
+    {
+      "id": "OSM-13681464367",
+      "type": "fuel",
+      "name": "Indian Oil",
+      "lat": 19.8155407,
+      "lon": 85.8406142,
+      "source": "OpenStreetMap",
+      "source_type": "real_public_data",
+      "osm_id": 13681464367,
+      "tags": {
+        "addr:city": "Puri",
+        "addr:district": "Puri",
+        "amenity": "fuel",
+        "brand": "Indian Oil",
+        "brand:wikidata": "Q1289348",
+        "fuel:Petrol": "yes",
+        "fuel:diesel": "yes",
+        "name": "Indian Oil"
+      }
+    }
+  ]
+}
