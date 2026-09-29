@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import {
 ArrowLeft,
 Camera,
@@ -33,7 +33,7 @@ type Mission = {
   affected_count?: number;
 };
 
-export default function FieldPage() {
+function FieldPageContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
 
@@ -1126,5 +1126,14 @@ function ActionButton({
       {icon}
       {label}
     </button>
+  );
+}
+
+
+export default function FieldPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-[#050b14]" />}>
+      <FieldPageContent />
+    </Suspense>
   );
 }
