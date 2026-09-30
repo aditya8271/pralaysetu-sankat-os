@@ -1,4 +1,4 @@
-﻿from fastapi import FastAPI
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from backend.app.api.scenarios import router as scenarios_router
@@ -22,6 +22,7 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "https://pralaysetu-sankat-os.vercel.app",
+        "https://pralaysetu-sankat-os-3.onrender.com",
         "https://pralaysetu-sankat-os-git-main-aditya8271s-projects.vercel.app",
         "http://localhost:3000",
         "http://127.0.0.1:3000",
@@ -37,6 +38,7 @@ app.add_middleware(
         "http://localhost:3000",
         "http://127.0.0.1:3000",
         "https://pralaysetu-sankat-os.vercel.app",
+        "https://pralaysetu-sankat-os-3.onrender.com",
     ],
     allow_credentials=True,
     allow_methods=["*"],
@@ -69,5 +71,4 @@ def health():
     return {
         "status": "ok"
     }
-
 
