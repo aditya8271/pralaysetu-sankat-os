@@ -104,7 +104,10 @@ def fetch_current_weather() -> dict:
         with urlopen(request, timeout=10) as response:
             payload = json.loads(response.read().decode("utf-8"))
 
-        current = payload.get("current") or {}
+        if not isinstance(payload, dict) or not isinstance(payload.get("current"), dict):
+            raise ValueError("Open-Meteo returned an invalid current-weather response")
+
+        current = payload["current"]
         units = payload.get("current_units") or {}
         provider_time = current.get("time")
         try:
@@ -116,10 +119,21 @@ def fetch_current_weather() -> dict:
 
         stale = age_seconds is None or age_seconds < -15 * 60 or age_seconds > FRESHNESS_LIMIT_SECONDS
         precip = current.get("precipitation")
+        usable_values = (
+            current.get("temperature_2m"),
+            precip,
+            current.get("wind_speed_10m"),
+            current.get("wind_direction_10m"),
+        )
+        if not any(isinstance(value, (int, float)) and not isinstance(value, bool) for value in usable_values):
+            raise ValueError("Open-Meteo returned no usable weather values")
+        forecast_time = _iso_utc(observed_at) if observed_at else None
 
         return {
             "status": "stale" if stale else "available",
-            "mode": "LIVE",
+            # Open-Meteo's current values are model-derived estimates, not
+            # direct observations, so they must not be represented as LIVE.
+            "mode": "FORECAST",
             "data_type": "current_conditions",
             "provider": PROVIDER,
             "source": "Open-Meteo Forecast API (model-based current conditions)",
@@ -129,7 +143,7 @@ def fetch_current_weather() -> dict:
             "fetched_at": _iso_utc(fetched_at),
             "observation_time": None,
             "provider_time": _iso_utc(observed_at) if observed_at else None,
-            "forecast_time": None,
+            "forecast_time": forecast_time,
             "freshness": "STALE" if stale else "FRESH",
             "stale": stale,
             "temperature_c": current.get("temperature_2m"),

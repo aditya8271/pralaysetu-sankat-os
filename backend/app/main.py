@@ -8,6 +8,7 @@ from backend.app.api.missions import router as missions_router
 from backend.app.api.field import router as field_router
 from backend.app.api.verification import router as verification_router
 from backend.app.api.operational_map import router as operational_map_router
+from backend.app.agents.router import router as agent_router
 from .api.dispatch import router as dispatch_router
 
 
@@ -50,6 +51,7 @@ app.include_router(missions_router, prefix="/api")
 app.include_router(field_router, prefix="/api")
 app.include_router(verification_router, prefix="/api")
 app.include_router(operational_map_router, prefix="/api")
+app.include_router(agent_router, prefix="/api")
 app.include_router(dispatch_router, prefix="/api")
 
 

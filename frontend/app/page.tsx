@@ -4,11 +4,13 @@ import dynamic from "next/dynamic";
 
 import {
   getMissions,
+  getAssets,
   getHazard,
   runImpactAnalysis,
   getCurrentWeather,
   analyzeCurrentWeather,
   acknowledgeMission,
+  API_BASE_URL,
 } from "../lib/api";
 
 import {
@@ -170,6 +172,9 @@ const [simulationMissions, setSimulationMissions] = useState<DisplayMission[]>([
   }, []);
   const [analysisRunning, setAnalysisRunning] = useState(false);
   const [assetCatalog, setAssetCatalog] = useState<Record<string, any>>({});
+  const [agentLoading, setAgentLoading] = useState(false);
+  const [agentResult, setAgentResult] = useState<any>(null);
+  const [agentError, setAgentError] = useState("");
 
   // Load the real OSM infrastructure catalogue once so the dependency
   // graph can show actual affected asset names/types instead of only
@@ -179,9 +184,7 @@ const [simulationMissions, setSimulationMissions] = useState<DisplayMission[]>([
 
     async function loadAssetCatalog() {
       try {
-        const response = await fetch("http://127.0.0.1:8001/api/assets");
-        if (!response.ok) return;
-        const data = await response.json();
+        const data: any = await getAssets();
         const assets = Array.isArray(data) ? data : data?.assets || [];
         const catalog: Record<string, any> = {};
         for (const asset of assets) {
@@ -323,6 +326,33 @@ const [simulationMissions, setSimulationMissions] = useState<DisplayMission[]>([
 
   const displayMissions =
     analysisMode === "LIVE" ? liveMissions : simulationMissions;
+
+  async function requestAgentInsight(kind: "briefing" | "mission") {
+    if (kind === "mission" && !selected?.id) return;
+
+    setAgentLoading(true);
+    setAgentError("");
+    setAgentResult(null);
+
+    try {
+      const endpoint =
+        kind === "briefing"
+          ? "/api/agents/briefing"
+          : `/api/agents/mission/${encodeURIComponent(selected!.id)}/insight`;
+      const response = await fetch(`${API_BASE_URL}${endpoint}`);
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result?.detail?.message || result?.detail || "AI agent request failed.");
+      }
+
+      setAgentResult(result);
+    } catch (error) {
+      setAgentError(error instanceof Error ? error.message : "AI agent request failed.");
+    } finally {
+      setAgentLoading(false);
+    }
+  }
 
   const handleNavClick = useCallback((label: string) => {
     setActiveNav(label);
@@ -467,7 +497,7 @@ useEffect(() => {
 
       // First move the mission into the backend's assigned state.
       const assignResponse = await fetch(
-        `http://127.0.0.1:8001/api/missions/${encodeURIComponent(selected.id)}/assign`,
+        `${API_BASE_URL}/api/missions/${encodeURIComponent(selected.id)}/assign`,
         { method: "POST" },
       );
 
@@ -478,7 +508,7 @@ useEffect(() => {
 
       // Then register the departmental/field-worker handoff.
       const dispatchResponse = await fetch(
-        `http://127.0.0.1:8001/api/dispatch/${encodeURIComponent(selected.id)}`,
+        `${API_BASE_URL}/api/dispatch/${encodeURIComponent(selected.id)}`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -522,7 +552,7 @@ useEffect(() => {
 
       try {
         const response = await fetch(
-          `http://127.0.0.1:8001/api/dispatch/${encodeURIComponent(selected.id)}`
+          `${API_BASE_URL}/api/dispatch/${encodeURIComponent(selected.id)}`
         );
         if (!response.ok) return;
         const data = await response.json();
@@ -792,7 +822,7 @@ useEffect(() => {
               onClick={() => {
                 setShowSourcesPanel(false);
                 setCommandMessage(
-                  "System status: backend connected. LIVE uses Open-Meteo model-based conditions; DEMO uses the controlled Puri cyclone dataset. All simulated outputs remain labelled."
+                  "System status: backend connected. FORECAST uses Open-Meteo model-based conditions; DEMO uses the controlled Puri cyclone dataset. All simulated outputs remain labelled."
                 );
                 setShowCommandPanel(true);
               }}
@@ -874,7 +904,7 @@ useEffect(() => {
               <div className="mb-2 flex items-center gap-2">
                 <Activity size={13} className="text-[#ffad32]" />
                 <span className="text-[10px] font-semibold">
-                  {analysisMode === "LIVE" ? "LIVE ANALYSIS" : "SIMULATION MODE"}
+                  {analysisMode === "LIVE" ? "FORECAST ANALYSIS" : "SIMULATION MODE"}
                 </span>
               </div>
 
@@ -917,7 +947,7 @@ useEffect(() => {
                     : "border-[#20344d] bg-[#0c1a2b] text-[#8da2bb] hover:text-white"
                 }`}
               >
-                LIVE ANALYSIS
+                FORECAST ANALYSIS
               </button>
               <button
                 onClick={() => {
@@ -946,12 +976,12 @@ useEffect(() => {
                   <CloudRain size={15} className="text-[#42a5ff]" />
                   <h2 className="text-[11px] font-bold tracking-[0.14em]">CURRENT CONDITIONS · PURI, ODISHA</h2>
                   <span className={`rounded border px-2 py-0.5 text-[8px] font-bold ${currentWeather?.status === "available" ? "border-[#24d18a]/30 bg-[#24d18a]/10 text-[#24d18a]" : currentWeather?.status === "stale" ? "border-[#ffad32]/30 bg-[#ffad32]/10 text-[#ffad32]" : "border-[#ff3b4e]/30 bg-[#ff3b4e]/10 text-[#ff7b88]"}`}>
-                    {weatherLoading ? "FETCHING" : currentWeather?.status === "available" ? "LIVE" : currentWeather?.status === "stale" ? "STALE" : "LIVE DATA UNAVAILABLE"}
+                    {weatherLoading ? "FETCHING" : currentWeather?.status === "available" ? (currentWeather?.mode || "FORECAST") : currentWeather?.status === "stale" ? "STALE" : "LIVE WEATHER UNAVAILABLE"}
                   </span>
                 </div>
                 {weatherError && <p className="mt-2 text-[9px] text-[#ff7b88]">{weatherError}. The current simulation remains available for demo.</p>}
                 <p className="mt-2 max-w-3xl text-[9px] leading-4 text-[#8da2bb]">
-                  LIVE WEATHER · Open-Meteo model-based current conditions · {analysisMode === "LIVE" ? "active operational assessment" : "reference conditions while demo simulation is active"}
+                  {currentWeather?.mode || "UNAVAILABLE"} WEATHER · Open-Meteo model-based current conditions · {analysisMode === "LIVE" ? "active operational assessment" : "reference conditions while demo simulation is active"}
                 </p>
                 {!weatherError && currentWeather?.message && <p className="mt-1 max-w-3xl text-[9px] leading-4 text-[#8da2bb]">{currentWeather.message}</p>}
               </div>
@@ -969,13 +999,16 @@ useEffect(() => {
               <WeatherMetric label="Wind direction" value={currentWeather?.wind_direction_degrees == null ? "Unavailable" : `${currentWeather.wind_direction_degrees}°`} />
             </div>
             <div className="mt-3 flex flex-wrap gap-x-5 gap-y-1 text-[8px] text-[#8da2bb]">
-              <span>Provider: {currentWeather?.provider || "Open-Meteo"}</span>
+              <span>Provider: {currentWeather?.provider || "Unavailable"}</span>
               <span>Weather: {currentWeather?.weather_status || "Unavailable"}</span>
-              <span>Warning: {currentWeather?.warning_status || "No provider warning feed"}</span>
+              <span>Observed: {currentWeather?.observation_time ? new Date(currentWeather.observation_time).toLocaleString() : "Unavailable"}</span>
+              <span>Forecast time: {currentWeather?.forecast_time ? new Date(currentWeather.forecast_time).toLocaleString() : "Unavailable"}</span>
+              <span>Warning: {currentWeather?.warning_status || "Unavailable from provider"}</span>
               <span>Fetched: {currentWeather?.fetched_at ? new Date(currentWeather.fetched_at).toLocaleString() : "Not fetched"}</span>
-              <span>Provider time: {currentWeather?.provider_time ? new Date(currentWeather.provider_time).toLocaleString() : "Unavailable"}</span>
+              <span>Data time: {currentWeather?.provider_time ? new Date(currentWeather.provider_time).toLocaleString() : "Unavailable"}</span>
+              <span>Freshness: {currentWeather?.freshness || "Unavailable"}</span>
             </div>
-            {currentWeather?.status === "stale" && <p className="mt-2 text-[9px] text-[#ffad32]">Provider data is stale; live analysis is disabled. Run the simulation for the demo.</p>}
+            {currentWeather?.status === "stale" && <p className="mt-2 text-[9px] text-[#ffad32]">Provider data is stale; forecast-based impact analysis is disabled. Run the simulation for the demo.</p>}
             {analysisError && <p role="alert" className="mt-2 text-[9px] text-[#ff7b88]">Analysis failed: {analysisError}</p>}
           </section>
           {/* INCIDENT CANVAS HEADER */}
@@ -986,7 +1019,7 @@ useEffect(() => {
                   Operational Impact Canvas
                 </h2>
                 <span className={`rounded border px-2 py-0.5 text-[8px] font-bold ${analysisMode === "LIVE" ? "border-[#24d18a]/20 bg-[#24d18a]/10 text-[#24d18a]" : "border-[#ffad32]/20 bg-[#ffad32]/10 text-[#ffad32]"}`}>
-                  {analysisMode}
+                  {analysisMode === "LIVE" ? "FORECAST" : analysisMode}
                 </span>
               </div>
 
@@ -1103,7 +1136,7 @@ useEffect(() => {
               <SmallLegend color="#24d18a" text="P2 Monitor" />
               <SmallLegend color="#42a5ff" text="Selected asset" />
               <span className="ml-auto hidden text-[8px] text-[#526a83] sm:block">
-                SOURCE: OSM GEOGRAPHY + {analysisMode === "LIVE" ? "OPEN-METEO WEATHER" : "SIMULATED EVENT"} - NOT LIVE GOVERNMENT DATA
+                SOURCE: OSM GEOGRAPHY + {analysisMode === "LIVE" ? "OPEN-METEO FORECAST" : "SIMULATED EVENT"} - NOT LIVE GOVERNMENT DATA
               </span>
             </div>
           </div>
@@ -1144,6 +1177,73 @@ useEffect(() => {
   value={`${acknowledgementRate}%`}
 />
           </div>
+
+          {/* OPTIONAL READ-ONLY AGENT INTELLIGENCE */}
+          <section id="ai-intelligence-agent" className="mt-3 rounded-xl border border-[#42a5ff]/25 bg-[#0c1a2b] p-4">
+            <div className="flex flex-wrap items-start justify-between gap-3">
+              <div>
+                <div className="flex items-center gap-2">
+                  <Bot size={14} className="text-[#42a5ff]" />
+                  <h3 className="text-[12px] font-semibold">AI Intelligence Agents</h3>
+                </div>
+                <p className="mt-1 text-[9px] text-[#8da2bb]">
+                  Optional read-only analysis. Agent output is supplementary and does not change missions or operational decisions.
+                </p>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  onClick={() => void requestAgentInsight("briefing")}
+                  disabled={agentLoading}
+                  className="rounded-lg border border-[#20344d] bg-[#091624] px-3 py-2 text-[9px] font-bold text-[#c6d2df] hover:border-[#42a5ff]/50 disabled:opacity-50"
+                >
+                  {agentLoading ? "ANALYZING..." : "SITUATION BRIEFING"}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => void requestAgentInsight("mission")}
+                  disabled={agentLoading || !selected}
+                  className="rounded-lg bg-[#42a5ff] px-3 py-2 text-[9px] font-bold text-[#06111e] hover:bg-[#64b4ff] disabled:opacity-50"
+                >
+                  EXPLAIN SELECTED MISSION
+                </button>
+              </div>
+            </div>
+
+            {agentError && (
+              <p role="alert" className="mt-3 rounded-lg border border-[#ff3b4e]/25 bg-[#ff3b4e]/[0.05] p-3 text-[9px] text-[#ff7b88]">
+                {agentError}
+              </p>
+            )}
+
+            {agentResult && (
+              <div className="mt-3 rounded-lg border border-[#20344d] bg-[#091624] p-3">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <p className="text-[10px] font-bold text-[#c6d2df]">
+                    {agentResult.agent || "AI Agent"}
+                  </p>
+                  <span className={`rounded px-2 py-1 text-[8px] font-bold ${agentResult.available ? "bg-[#24d18a]/10 text-[#24d18a]" : "bg-[#ffad32]/10 text-[#ffad32]"}`}>
+                    {agentResult.available ? "AI ANALYSIS READY" : "AI UNAVAILABLE"}
+                  </span>
+                </div>
+                <p className="mt-2 text-[10px] leading-5 text-[#8da2bb]">
+                  {agentResult.summary || agentResult.message || "No agent summary returned."}
+                </p>
+                {(Array.isArray(agentResult.observations) && agentResult.observations.length > 0 ||
+                  Array.isArray(agentResult.reasoning) && agentResult.reasoning.length > 0 ||
+                  Array.isArray(agentResult.recommendations) && agentResult.recommendations.length > 0) && (
+                  <ul className="mt-2 space-y-1 text-[9px] leading-4 text-[#8da2bb]">
+                    {[...(agentResult.observations || []), ...(agentResult.reasoning || []), ...(agentResult.recommendations || [])].map((item: string, index: number) => (
+                      <li key={`${index}-${item}`}>• {item}</li>
+                    ))}
+                  </ul>
+                )}
+                <p className="mt-2 border-t border-[#20344d] pt-2 text-[8px] text-[#526a83]">
+                  Based on existing project data · AI interpretation is not confirmed ground truth.
+                </p>
+              </div>
+            )}
+          </section>
 
           {/* CASCADE */}
           <div id="dependency-graph-section" className="mt-3 rounded-xl border border-[#20344d] bg-[#0c1a2b]">
@@ -1260,7 +1360,7 @@ useEffect(() => {
                 <div className="rounded-lg border border-[#20344d] bg-[#091624] p-3">
                   <p className="text-[9px] font-semibold text-[#c6d2df]">NO ACTIVE CASCADE</p>
                   <p className="mt-1 text-[8px] leading-4 text-[#526a83]">
-                    Current LIVE conditions are not producing an actionable weather-triggered mission. Candidate dependencies are shown only after the controlled simulation is run.
+                    Current forecast conditions are not producing an actionable weather-triggered mission. Candidate dependencies are shown only after the controlled simulation is run.
                   </p>
                 </div>
               </div>
@@ -1710,7 +1810,7 @@ useEffect(() => {
                 }}
                 className="rounded-lg bg-[#42a5ff] px-3 py-2.5 text-[9px] font-bold text-[#06111e]"
               >
-                {analysisMode === "SIMULATION" ? "RUN IMPACT ANALYSIS" : "ANALYZE LIVE"}
+                {analysisMode === "SIMULATION" ? "RUN IMPACT ANALYSIS" : "ANALYZE FORECAST"}
               </button>
 
               <button

@@ -16,6 +16,7 @@ Camera,
   Loader2,
 } from "lucide-react";
 import { useSearchParams, useRouter } from "next/navigation";
+import { API_BASE_URL } from "../../lib/api";
 
 type Mission = {
   id: string;
@@ -31,6 +32,8 @@ type Mission = {
   priority_score?: number;
   cascade_score?: number;
   affected_count?: number;
+  hazard?: { safety_phase?: string };
+  evidence?: { uploaded_at?: string };
 };
 
 function FieldPageContent() {
@@ -40,6 +43,7 @@ function FieldPageContent() {
   const missionId = searchParams.get("mission");
 
   const [mission, setMission] = useState<Mission | null>(null);
+  const [safetyPhase, setSafetyPhase] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
   const [photo, setPhoto] = useState<File | null>(null);
@@ -53,11 +57,22 @@ function FieldPageContent() {
   const [verification, setVerification] = useState<any>(null);
   const [verificationError, setVerificationError] = useState("");
   const [voiceFile, setVoiceFile] = useState<File | null>(null);
+  const [selectedLanguage, setSelectedLanguage] = useState("English");
   const [isRecording, setIsRecording] = useState(false);
+  const [isListening, setIsListening] = useState(false);
+  const [speechStatus, setSpeechStatus] = useState(
+    "Speech-to-text is available in supported browsers."
+  );
   const [voiceSeconds, setVoiceSeconds] = useState(0);
+  const [evidenceTimestamp, setEvidenceTimestamp] = useState<string | null>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const voiceChunksRef = useRef<Blob[]>([]);
   const voiceTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const speechRecognitionRef = useRef<any>(null);
+
+  const canFieldDeploy =
+    !safetyPhase || safetyPhase === "PRE_LANDFALL" || safetyPhase === "POST_CLEARANCE";
+  const canCollectEvidence = !safetyPhase || safetyPhase === "POST_CLEARANCE";
 
   useEffect(() => {
     async function loadMission() {
@@ -70,7 +85,7 @@ function FieldPageContent() {
   try {
     // First try direct mission endpoint
     const directResponse = await fetch(
-      `http://127.0.0.1:8001/api/missions/${encodeURIComponent(
+      `${API_BASE_URL}/api/missions/${encodeURIComponent(
         missionId
       )}`
     );
@@ -78,14 +93,24 @@ function FieldPageContent() {
     if (directResponse.ok) {
       const data = await directResponse.json();
 
-      setMission(data.mission || data);
+      const loadedMission = data.mission || data;
+      setMission(loadedMission);
+      try {
+        const hazardResponse = await fetch(`${API_BASE_URL}/api/hazard`);
+        if (hazardResponse.ok) {
+          const hazardData = await hazardResponse.json();
+          setSafetyPhase(hazardData?.hazard?.safety_phase || null);
+        }
+      } catch {
+        setSafetyPhase(null);
+      }
       setStatus("ready");
       return;
     }
 
     // Fallback: load complete mission list
     const missionsResponse = await fetch(
-      "http://127.0.0.1:8001/api/missions"
+      `${API_BASE_URL}/api/missions`
     );
 
     if (!missionsResponse.ok) {
@@ -109,6 +134,15 @@ function FieldPageContent() {
     }
 
     setMission(foundMission);
+    try {
+      const hazardResponse = await fetch(`${API_BASE_URL}/api/hazard`);
+      if (hazardResponse.ok) {
+        const hazardData = await hazardResponse.json();
+        setSafetyPhase(hazardData?.hazard?.safety_phase || null);
+      }
+    } catch {
+      setSafetyPhase(null);
+    }
     setStatus("ready");
   } catch (error) {
     console.error("Failed to load mission:", error);
@@ -122,6 +156,7 @@ function FieldPageContent() {
   }, [missionId]);
 
   function getGPS() {
+    if (!canFieldDeploy) return;
     if (!navigator.geolocation) {
       alert("GPS is not supported by this browser.");
       return;
@@ -141,6 +176,93 @@ function FieldPageContent() {
     );
   }
 
+  function getLanguageCode(language: string) {
+    switch (language) {
+      case "Hindi":
+        return "hi-IN";
+      case "Odia":
+        return "or-IN";
+      default:
+        return "en-IN";
+    }
+  }
+
+  function toggleSpeechRecognition() {
+    const SpeechRecognitionCtor =
+      (window as any).SpeechRecognition ||
+      (window as any).webkitSpeechRecognition;
+
+    if (!SpeechRecognitionCtor) {
+      setSpeechStatus(
+        "Speech-to-text is unavailable in this browser. You can still type or edit the observation manually."
+      );
+      return;
+    }
+
+    if (isListening) {
+      speechRecognitionRef.current?.stop();
+      return;
+    }
+
+    try {
+      const recognition = new SpeechRecognitionCtor();
+      recognition.lang = getLanguageCode(selectedLanguage);
+      recognition.continuous = false;
+      recognition.interimResults = false;
+
+      recognition.onresult = (event: any) => {
+        const newestResult = event.results?.[event.results.length - 1];
+        const transcriptText = newestResult?.[0]?.transcript?.trim();
+
+        if (!transcriptText) return;
+
+        setNotes((previous) =>
+          previous ? `${previous} ${transcriptText}`.trim() : transcriptText
+        );
+      };
+
+      recognition.onerror = (event: any) => {
+        setSpeechStatus(
+          `Speech recognition error: ${event?.error || "Unable to listen"}. You can still type the observation manually.`
+        );
+        setIsListening(false);
+      };
+
+      recognition.onend = () => {
+        setIsListening(false);
+        setSpeechStatus(
+          "Transcript ready. Review and edit the observation before uploading evidence."
+        );
+      };
+
+      speechRecognitionRef.current = recognition;
+      setIsListening(true);
+      setSpeechStatus("Listening... speak your field observation.");
+      recognition.start();
+    } catch (error) {
+      console.error("Speech recognition failed:", error);
+      setSpeechStatus(
+        "Speech-to-text could not start. Please try again or type the observation manually."
+      );
+    }
+  }
+
+  function speakObservation() {
+    if (typeof window === "undefined" || !("speechSynthesis" in window)) {
+      setSpeechStatus(
+        "Text-to-speech is unavailable in this browser. Please read the observation manually."
+      );
+      return;
+    }
+
+    const text = notes.trim() || mission?.action || "No observation available yet.";
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = getLanguageCode(selectedLanguage);
+    window.speechSynthesis.cancel();
+    window.speechSynthesis.speak(utterance);
+    setSpeechStatus("Reading the observation aloud...");
+  }
+
   function stopVoiceTimer() {
     if (voiceTimerRef.current) {
       clearInterval(voiceTimerRef.current);
@@ -149,6 +271,7 @@ function FieldPageContent() {
   }
 
   async function toggleVoiceCapture() {
+    if (!canCollectEvidence) return;
     if (isRecording) {
       mediaRecorderRef.current?.stop();
       return;
@@ -169,12 +292,14 @@ function FieldPageContent() {
       };
 
       recorder.onstop = () => {
+        const mimeType = recorder.mimeType || "audio/webm";
         const blob = new Blob(voiceChunksRef.current, {
-          type: recorder.mimeType || "audio/webm",
+          type: mimeType,
         });
+        const extension = mimeType.includes("mp4") ? "m4a" : mimeType.includes("ogg") ? "ogg" : "webm";
         const file = new File(
           [blob],
-          `field-voice-${missionId || "mission"}-${Date.now()}.webm`,
+          `field-voice-${missionId || "mission"}-${Date.now()}.${extension}`,
           { type: blob.type || "audio/webm" }
         );
         setVoiceFile(file);
@@ -200,7 +325,11 @@ function FieldPageContent() {
   useEffect(() => {
     return () => {
       mediaRecorderRef.current?.stop();
+      speechRecognitionRef.current?.stop();
       stopVoiceTimer();
+      if (typeof window !== "undefined" && "speechSynthesis" in window) {
+        window.speechSynthesis.cancel();
+      }
     };
   }, []);
 
@@ -208,6 +337,10 @@ function FieldPageContent() {
     endpoint: "acknowledge" | "start" | "complete"
   ) {
     if (!missionId) return;
+    if ((endpoint === "start" || endpoint === "complete") && !canFieldDeploy) {
+      alert("Field deployment is unavailable until the backend reports POST_CLEARANCE.");
+      return;
+    }
 
     try {
       setActionLoading(true);
@@ -217,7 +350,7 @@ function FieldPageContent() {
       // Backend lifecycle: PENDING -> ASSIGNED -> ACKNOWLEDGED -> IN_PROGRESS -> VERIFICATION_REQUIRED
       if (endpoint === "acknowledge" && ["pending", ""].includes(currentStatus)) {
         const assignResponse = await fetch(
-          `http://127.0.0.1:8001/api/missions/${encodeURIComponent(missionId)}/assign`,
+          `${API_BASE_URL}/api/missions/${encodeURIComponent(missionId)}/assign`,
           { method: "POST" }
         );
 
@@ -233,7 +366,7 @@ function FieldPageContent() {
 
       if (endpoint === "acknowledge" && ["pending", "assigned"].includes(currentStatus)) {
         const response = await fetch(
-          `http://127.0.0.1:8001/api/missions/${encodeURIComponent(missionId)}/acknowledge`,
+          `${API_BASE_URL}/api/missions/${encodeURIComponent(missionId)}/acknowledge`,
           { method: "POST" }
         );
 
@@ -254,7 +387,7 @@ function FieldPageContent() {
         }
 
         const response = await fetch(
-          `http://127.0.0.1:8001/api/missions/${encodeURIComponent(missionId)}/start`,
+          `${API_BASE_URL}/api/missions/${encodeURIComponent(missionId)}/start`,
           { method: "POST" }
         );
 
@@ -275,7 +408,7 @@ function FieldPageContent() {
         }
 
         const response = await fetch(
-          `http://127.0.0.1:8001/api/missions/${encodeURIComponent(missionId)}/complete`,
+          `${API_BASE_URL}/api/missions/${encodeURIComponent(missionId)}/complete`,
           { method: "POST" }
         );
 
@@ -298,6 +431,10 @@ function FieldPageContent() {
 
   async function uploadEvidence() {
     if (!missionId) return;
+    if (!canCollectEvidence) {
+      alert("Evidence collection is unavailable until the backend reports POST_CLEARANCE.");
+      return;
+    }
 
     if (!photo && !notes.trim() && !gps && !voiceFile) {
       alert("Add photo, GPS or field notes first.");
@@ -320,13 +457,16 @@ function FieldPageContent() {
       }
 
       formData.append("notes", notes);
+      formData.append("transcript", notes.trim());
+      formData.append("voice_language", selectedLanguage);
+      formData.append("observation_language", selectedLanguage);
 
       if (voiceFile) {
         formData.append("voice", voiceFile);
       }
 
       const uploadResponse = await fetch(
-        `http://127.0.0.1:8001/api/missions/${encodeURIComponent(
+        `${API_BASE_URL}/api/missions/${encodeURIComponent(
           missionId
         )}/evidence/upload`,
         {
@@ -347,11 +487,12 @@ function FieldPageContent() {
       if (uploadData?.mission) {
         setMission(uploadData.mission);
       }
+      setEvidenceTimestamp(uploadData?.evidence?.uploaded_at || null);
 
       setStatus("evidence_uploaded");
 
       const verifyResponse = await fetch(
-        `http://127.0.0.1:8001/api/missions/${encodeURIComponent(
+        `${API_BASE_URL}/api/missions/${encodeURIComponent(
           missionId
         )}/verify`,
         {
@@ -375,7 +516,7 @@ function FieldPageContent() {
 
       try {
         const missionResponse = await fetch(
-          `http://127.0.0.1:8001/api/missions/${encodeURIComponent(
+          `${API_BASE_URL}/api/missions/${encodeURIComponent(
             missionId
           )}`
         );
@@ -472,6 +613,19 @@ function FieldPageContent() {
     mission.asset ||
     "Unknown asset";
 
+  const reassessment = verification?.reassessment;
+  const roadAfter = reassessment?.road;
+  const reassessedAsset = reassessment?.asset as {
+    priority?: { priorities?: Array<{ asset_id?: string; priority?: string }> };
+    impact?: { results?: Array<{ asset?: { id?: string }; impact?: { score?: number } }> };
+  } | undefined;
+  const assetPriorityAfter = reassessedAsset?.priority?.priorities?.find(
+    (item) => String(item.asset_id) === String(mission.asset_id || mission.asset || missionAsset)
+  );
+  const assetImpactAfter = reassessedAsset?.impact?.results?.find(
+    (item) => String(item.asset?.id) === String(mission.asset_id || mission.asset || missionAsset)
+  );
+
   return (
     <main className="min-h-screen bg-[#07111f] text-white">
       {/* HEADER */}
@@ -518,8 +672,11 @@ function FieldPageContent() {
               </div>
 
               <h1 className="mt-3 text-xl font-bold">
-                {mission.action ||
-                  "Inspect affected infrastructure"}
+                {canFieldDeploy
+                  ? mission.action || "Verify assigned infrastructure"
+                  : safetyPhase === "DURING_STORM"
+                    ? "Remote monitoring only — do not enter the affected area"
+                    : "Field mission held pending post-clearance"}
               </h1>
 
               <p className="mt-1 font-mono text-[10px] text-[#526a83]">
@@ -556,6 +713,19 @@ function FieldPageContent() {
               value={`${mission.deadline_minutes || 0}m`}
             />
           </div>
+        </section>
+
+        <section className={`mt-3 rounded-xl border p-4 text-xs ${canFieldDeploy ? "border-[#24d18a]/30 bg-[#24d18a]/[0.05] text-[#24d18a]" : "border-[#ffad32]/30 bg-[#ffad32]/[0.05] text-[#ffad32]"}`} role="status">
+          <p className="font-bold">Backend safety phase: {safetyPhase || "UNAVAILABLE"}</p>
+          <p className="mt-1 text-[10px] text-[#8da2bb]">
+            {safetyPhase === "POST_CLEARANCE"
+              ? "Post-clearance: field verification and evidence collection are allowed."
+              : safetyPhase === "DURING_STORM"
+                ? "Active storm: do not enter the affected area. Remote monitoring only; field actions and evidence capture are disabled."
+                : safetyPhase === "PRE_LANDFALL"
+                  ? "Pre-landfall: planned inspection deployment is allowed. Evidence capture and upload remain held until post-clearance."
+                  : "Safety phase is unavailable. Field deployment and evidence capture are disabled."}
+          </p>
         </section>
 
         {/* LOCATION */}
@@ -656,7 +826,7 @@ function FieldPageContent() {
               onClick={() =>
                 updateMissionStatus("start")
               }
-              disabled={actionLoading}
+              disabled={actionLoading || !canFieldDeploy}
             />
 
             <ActionButton
@@ -665,7 +835,7 @@ function FieldPageContent() {
               onClick={() =>
                 updateMissionStatus("complete")
               }
-              disabled={actionLoading}
+              disabled={actionLoading || !canFieldDeploy}
             />
           </div>
         </section>
@@ -680,7 +850,13 @@ function FieldPageContent() {
               </h2>
 
               <p className="mt-1 text-[10px] text-[#8da2bb]">
-                Submit photo, GPS and field notes.
+                {canCollectEvidence
+                  ? "Submit photo, GPS and field notes."
+                  : safetyPhase === "DURING_STORM"
+                    ? "Remote monitoring notes only; physical evidence capture and upload are blocked."
+                    : safetyPhase === "PRE_LANDFALL"
+                      ? "Notes and planned-inspection GPS are available. Photo, voice and evidence submission remain held until post-clearance."
+                      : "Notes can be drafted. Evidence capture and submission remain blocked until the backend safety phase is available."}
               </p>
             </div>
 
@@ -689,10 +865,15 @@ function FieldPageContent() {
               className="text-[#42a5ff]"
             />
           </div>
+          <p className="mt-2 text-[9px] text-[#8da2bb]">
+            {evidenceTimestamp || mission.evidence?.uploaded_at
+              ? `Evidence timestamp: ${new Date(evidenceTimestamp || mission.evidence?.uploaded_at || "").toLocaleString()}`
+              : "Evidence not uploaded"}
+          </p>
 
           {/* PHOTO */}
 
-          <label className="mt-4 flex cursor-pointer items-center gap-3 rounded-xl border border-dashed border-[#36516c] bg-[#091624] p-4 hover:border-[#42a5ff]">
+          <label className={`mt-4 flex items-center gap-3 rounded-xl border border-dashed border-[#36516c] bg-[#091624] p-4 ${canCollectEvidence ? "cursor-pointer hover:border-[#42a5ff]" : "cursor-not-allowed opacity-50"}`}>
             <Upload
               size={18}
               className="text-[#42a5ff]"
@@ -714,6 +895,7 @@ function FieldPageContent() {
               type="file"
               accept="image/*"
               capture="environment"
+              disabled={!canCollectEvidence}
               className="hidden"
               onChange={(event) => {
                 setPhoto(
@@ -727,7 +909,8 @@ function FieldPageContent() {
 
           <button
             onClick={getGPS}
-            className="mt-2 flex w-full items-center justify-between rounded-xl border border-[#20344d] bg-[#091624] p-4 text-left hover:border-[#42a5ff]"
+            disabled={!canFieldDeploy}
+            className="mt-2 flex w-full items-center justify-between rounded-xl border border-[#20344d] bg-[#091624] p-4 text-left hover:border-[#42a5ff] disabled:cursor-not-allowed disabled:opacity-50"
           >
             <div className="flex items-center gap-3">
               <MapPin
@@ -761,14 +944,58 @@ function FieldPageContent() {
             />
           </button>
 
+          <div className="mt-2 rounded-xl border border-[#20344d] bg-[#091624] p-3">
+            <label className="flex items-center justify-between gap-3 text-[9px] font-semibold uppercase tracking-[0.18em] text-[#8da2bb]">
+              Observation language
+              <select
+                value={selectedLanguage}
+                onChange={(event) => setSelectedLanguage(event.target.value)}
+                disabled={!canCollectEvidence}
+                className="rounded-md border border-[#20344d] bg-[#0c1a2b] px-2 py-1 text-[9px] text-white outline-none"
+              >
+                <option>English</option>
+                <option>Hindi</option>
+                <option>Odia</option>
+              </select>
+            </label>
+
+            <div className="mt-3 flex gap-2">
+              <button
+                type="button"
+                onClick={toggleSpeechRecognition}
+                disabled={actionLoading || !canCollectEvidence}
+                className={`flex flex-1 items-center justify-center gap-2 rounded-lg border px-3 py-2 text-[9px] font-bold transition ${
+                  isListening
+                    ? "border-[#ff3b4e]/40 bg-[#ff3b4e]/[0.06] text-[#ff7b88]"
+                    : "border-[#20344d] bg-[#091624] text-[#8da2bb] hover:border-[#42a5ff]/50"
+                }`}
+              >
+                <Mic size={14} className={isListening ? "animate-pulse" : ""} />
+                {isListening ? "LISTENING" : "RECORD OBSERVATION"}
+              </button>
+
+              <button
+                type="button"
+                onClick={speakObservation}
+                disabled={!notes.trim() || !canCollectEvidence}
+                className="flex items-center justify-center gap-2 rounded-lg border border-[#20344d] bg-[#091624] px-3 py-2 text-[9px] font-bold text-[#8da2bb] hover:border-[#42a5ff]/50 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                <span>🔊</span>
+                READ ALOUD
+              </button>
+            </div>
+
+            <p className="mt-2 text-[8px] text-[#526a83]">{speechStatus}</p>
+          </div>
+
           {/* NOTES */}
 
           <textarea
             value={notes}
-            onChange={(event) =>
-              setNotes(event.target.value)
-            }
-            placeholder="Describe what you observed in the field..."
+            onChange={(event) => setNotes(event.target.value)}
+            placeholder={safetyPhase === "DURING_STORM"
+              ? "Remote monitoring notes only; do not enter the affected area..."
+              : "Describe observations from your approved inspection..."}
             className="mt-2 h-28 w-full resize-none rounded-xl border border-[#20344d] bg-[#091624] p-4 text-xs text-white outline-none placeholder:text-[#526a83] focus:border-[#42a5ff]"
           />
 
@@ -777,7 +1004,7 @@ function FieldPageContent() {
           <button
             type="button"
             onClick={toggleVoiceCapture}
-            disabled={actionLoading}
+            disabled={actionLoading || !canCollectEvidence}
             className={`mt-2 flex w-full items-center justify-between rounded-xl border p-4 text-left text-xs transition ${
               isRecording
                 ? "border-[#ff3b4e]/40 bg-[#ff3b4e]/[0.06] text-[#ff7b88]"
@@ -814,11 +1041,15 @@ function FieldPageContent() {
             </span>
           </button>
 
+          <p className="mt-2 text-[8px] text-[#526a83]">
+            The original voice evidence remains in place; the selected language is used for speech-to-text and read-aloud support when supported by the browser.
+          </p>
+
           {/* UPLOAD */}
 
           <button
             onClick={uploadEvidence}
-            disabled={actionLoading}
+            disabled={actionLoading || !canCollectEvidence}
             className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl bg-[#42a5ff] py-3 text-xs font-black text-[#06111e] hover:bg-[#64b4ff] disabled:opacity-50"
           >
             {actionLoading ? (
@@ -1016,6 +1247,22 @@ function FieldPageContent() {
                             )}
                           />
                         </div>
+                        <div className="mt-3 grid grid-cols-2 gap-2 border-t border-[#20344d] pt-3">
+                          <div className="rounded-lg border border-[#20344d] p-3">
+                            <p className="text-[7px] uppercase tracking-wider text-[#526a83]">Before field evidence</p>
+                            <p className="mt-1 text-[10px]">{mission.priority || priority} · risk {mission.risk_score ?? mission.priority_score ?? "Unavailable"}</p>
+                          </div>
+                          <div className="rounded-lg border border-[#20344d] p-3">
+                            <p className="text-[7px] uppercase tracking-wider text-[#526a83]">After reassessment</p>
+                            {roadAfter ? (
+                              <p className="mt-1 text-[10px]">{roadAfter.field_state || "Status unavailable"} · {roadAfter.operational_priority?.priority || "Priority unavailable"} · risk {roadAfter.predicted_risk?.risk_score ?? "Unavailable"}</p>
+                            ) : assetPriorityAfter || assetImpactAfter ? (
+                              <p className="mt-1 text-[10px]">{assetPriorityAfter?.priority || "Priority unavailable"} · impact {assetImpactAfter?.impact?.score ?? "Unavailable"}</p>
+                            ) : (
+                              <p className="mt-1 text-[10px]">Returned after-state unavailable</p>
+                            )}
+                          </div>
+                        </div>
                       </div>
                     )}
                   </>
@@ -1137,3 +1384,4 @@ export default function FieldPage() {
     </Suspense>
   );
 }
+

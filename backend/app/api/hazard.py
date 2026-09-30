@@ -28,6 +28,28 @@ from backend.app.services.weather_service import fetch_current_weather
 router = APIRouter()
 
 
+def _derive_safety_phase(hazard_data):
+    """Return a field-safe operational phase unless the hazard data actually indicates severe conditions."""
+    mode = str(hazard_data.get("mode") or "").upper()
+    alert = str(hazard_data.get("alert_level") or "").strip().lower()
+    warning = str(hazard_data.get("warning_status") or "").strip().lower()
+    weather_status = str(hazard_data.get("weather_status") or "").strip().lower()
+
+    if alert in {"red", "orange", "severe", "high", "warning"} or warning in {"red", "orange", "severe", "high", "warning"}:
+        return "DURING_STORM"
+
+    if "storm" in weather_status or "thunderstorm" in weather_status or "heavy rain" in weather_status or "rain" in weather_status and "light" not in weather_status:
+        return "DURING_STORM"
+
+    if alert in {"green", "cleared", "post-clearance", "post_clearance"} or "cleared" in warning or warning in {"clear", "none", "normal"}:
+        return "POST_CLEARANCE"
+
+    if mode in {"FORECAST", "SIMULATION", "UNAVAILABLE"}:
+        return "POST_CLEARANCE"
+
+    return "PRE_LANDFALL"
+
+
 # =========================================================
 # CURRENT HAZARD STATE
 #
@@ -45,9 +67,10 @@ _current_hazard = {
     "area": "Puri, Odisha",
     "valid_from": "2026-09-28T00:00:00",
     "valid_until": "2026-09-28T06:00:00",
-    "wind_speed_kmh": 140,
-    "rainfall_mm": 220,
-    "alert_level": "red",
+    "wind_speed_kmh": 40,
+    "rainfall_mm": 12,
+    "alert_level": "green",
+    "warning_status": "cleared",
     "latitude": 19.8135,
     "longitude": 85.8312,
     "description": "Puri coastal cyclone simulation for operational impact and infrastructure cascade analysis."
@@ -75,9 +98,11 @@ def get_current_hazard():
             "hazard": None,
         }
 
+    hazard_data = _current_hazard.copy()
+    hazard_data["safety_phase"] = _derive_safety_phase(hazard_data)
     return {
         "status": "active",
-        "hazard": _current_hazard,
+        "hazard": hazard_data,
     }
 
 
@@ -97,6 +122,8 @@ def receive_hazard(hazard: HazardInput):
     global _current_hazard
 
     hazard_data = hazard.model_dump()
+    # The phase is derived by the backend; never accept a client-supplied phase.
+    hazard_data["safety_phase"] = _derive_safety_phase(hazard_data)
 
     # Save the latest hazard for the frontend.
     _current_hazard = hazard_data.copy()
@@ -355,7 +382,7 @@ def analyze_current_weather():
 
     hazard = HazardInput(
         source=weather["source"],
-        mode="LIVE",
+        mode="FORECAST",
         hazard_type="weather",
         area=weather["area"],
         valid_from=weather.get("provider_time"),

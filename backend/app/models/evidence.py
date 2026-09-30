@@ -8,3 +8,5 @@ class EvidenceInput(BaseModel):
     longitude: Optional[float] = None
     notes: Optional[str] = None
     transcript: Optional[str] = None
+    voice_language: Optional[str] = None
+    observation_language: Optional[str] = None

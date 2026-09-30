@@ -1,8 +1,9 @@
 from fastapi import APIRouter, HTTPException, UploadFile, File, Form
 from pathlib import Path
-from datetime import datetime
+from datetime import datetime, timezone
 
 from backend.app.api.missions import get_mission
+from backend.app.api import hazard as hazard_api
 
 router = APIRouter()
 
@@ -17,10 +18,27 @@ async def upload_evidence(
     longitude: float = Form(...),
     notes: str = Form(""),
     transcript: str = Form(""),
+    voice_language: str = Form("English"),
+    observation_language: str = Form("English"),
     photo: UploadFile | None = File(None),
     voice: UploadFile | None = File(None),
 ):
     mission = get_mission(mission_id)
+
+    current_phase = hazard_api._derive_safety_phase(hazard_api._current_hazard or {})
+    if current_phase != "POST_CLEARANCE":
+        raise HTTPException(
+            status_code=403,
+            detail=f"Evidence upload is disabled during safety phase {current_phase}.",
+        )
+
+    valid_languages = {"English", "Hindi", "Odia"}
+    if voice_language not in valid_languages:
+        raise HTTPException(status_code=400, detail="Unsupported voice report language")
+    if observation_language not in valid_languages:
+        raise HTTPException(status_code=400, detail="Unsupported observation language")
+
+    effective_transcript = transcript.strip() or notes.strip()
 
     mission_dir = EVIDENCE_DIR / mission_id
     mission_dir.mkdir(parents=True, exist_ok=True)
@@ -56,7 +74,7 @@ async def upload_evidence(
     if voice:
         voice_ext = Path(voice.filename or "").suffix.lower()
 
-        allowed_voice = [".wav", ".mp3", ".m4a", ".ogg"]
+        allowed_voice = [".wav", ".mp3", ".m4a", ".ogg", ".webm"]
 
         if voice_ext not in allowed_voice:
             raise HTTPException(
@@ -79,10 +97,13 @@ async def upload_evidence(
 
     # Save evidence metadata
     mission["evidence"] = {
+        "uploaded_at": datetime.now(timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z"),
         "latitude": latitude,
         "longitude": longitude,
         "notes": notes,
-        "transcript": transcript,
+        "transcript": effective_transcript,
+        "voice_language": voice_language,
+        "observation_language": observation_language,
         "files": saved_files,
         "photo_uploaded": photo is not None,
         "voice_uploaded": voice is not None,

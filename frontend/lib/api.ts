@@ -1,25 +1,53 @@
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8001";
+export const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8002";
 
-async function apiFetch<T>(
+export async function apiFetch<T>(
   endpoint: string,
   options?: RequestInit
 ): Promise<T> {
-  const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-    ...options,
-    headers: {
-      "Content-Type": "application/json",
-      ...(options?.headers || {}),
-    },
-  });
+  const targetUrls = process.env.NEXT_PUBLIC_API_URL
+    ? [process.env.NEXT_PUBLIC_API_URL]
+    : [
+        API_BASE_URL,
+        "http://127.0.0.1:8001",
+        "http://127.0.0.1:8000",
+        "http://localhost:8002",
+        "http://localhost:8001",
+      ];
 
-  if (!response.ok) {
-    throw new Error(
-      `API request failed: ${response.status} ${response.statusText}`
-    );
+  const uniqueUrls = Array.from(new Set(targetUrls));
+  let lastError: any = null;
+
+  for (let i = 0; i < uniqueUrls.length; i++) {
+    const base = uniqueUrls[i];
+    try {
+      const response = await fetch(`${base}${endpoint}`, {
+        ...options,
+        headers: {
+          "Content-Type": "application/json",
+          ...(options?.headers || {}),
+        },
+      });
+
+      if (!response.ok) {
+        if (response.status === 404 && i < uniqueUrls.length - 1) {
+          continue;
+        }
+        throw new Error(
+          `API request failed: ${response.status} ${response.statusText}`
+        );
+      }
+
+      return response.json();
+    } catch (err) {
+      lastError = err;
+      if (i < uniqueUrls.length - 1) {
+        continue;
+      }
+    }
   }
 
-  return response.json();
+  throw lastError || new Error(`API request failed: ${endpoint}`);
 }
 
 export async function getScenarios() {
@@ -32,6 +60,10 @@ export async function getAssets() {
 
 export async function getMissions() {
   return apiFetch("/api/missions");
+}
+
+export async function getOperationalMap() {
+  return apiFetch<any>("/api/operational-map");
 }
 
 export async function getHazard() {

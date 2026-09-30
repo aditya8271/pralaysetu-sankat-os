@@ -11,6 +11,7 @@ import {
 } from "react-leaflet";
 
 import "leaflet/dist/leaflet.css";
+import { getOperationalMap } from "../lib/api";
 
 // GeoJSON supports Leaflet's onEachFeature callback, but some
 // react-leaflet type versions omit it from GeoJSONProps.
@@ -64,17 +65,7 @@ export default function OperationalMap({
       try {
         setLoading(true);
 
-        const response = await fetch(
-          "http://127.0.0.1:8001/api/operational-map"
-        );
-
-        if (!response.ok) {
-          throw new Error(
-            `Operational map request failed: ${response.status}`
-          );
-        }
-
-        const data = await response.json();
+        const data = await getOperationalMap();
 
         setMapData(data);
         setError("");
@@ -100,7 +91,7 @@ export default function OperationalMap({
   );
 
   /* -------------------------------- */
-  /* ROAD → MISSION MATCHING           */
+  /* ROAD -> MISSION MATCHING          */
   /* -------------------------------- */
 
   function getMissionForRoad(
@@ -119,7 +110,7 @@ export default function OperationalMap({
   }
 
   /* -------------------------------- */
-  /* ASSET COLORS                      */
+  /* ASSET COLORS                     */
   /* -------------------------------- */
 
   function getAssetColor(type: string = "") {
@@ -156,7 +147,7 @@ export default function OperationalMap({
   }
 
   /* -------------------------------- */
-  /* ASSET → MISSION MATCHING          */
+  /* ASSET -> MISSION MATCHING         */
   /* -------------------------------- */
 
   function getMissionForAsset(assetId: string) {
@@ -166,7 +157,7 @@ export default function OperationalMap({
   }
 
   /* -------------------------------- */
-  /* MISSION COLOR                     */
+  /* MISSION COLOR                    */
   /* -------------------------------- */
 
   function getMissionColor(mission?: Mission) {
@@ -189,7 +180,7 @@ export default function OperationalMap({
     <div className="relative h-full w-full">
 
       {/* ============================= */}
-      {/* LOADING                        */}
+      {/* LOADING                       */}
       {/* ============================= */}
 
       {loading && (
@@ -203,7 +194,7 @@ export default function OperationalMap({
       )}
 
       {/* ============================= */}
-      {/* ERROR                          */}
+      {/* ERROR                         */}
       {/* ============================= */}
 
       {error && (
@@ -215,7 +206,7 @@ export default function OperationalMap({
       )}
 
       {/* ============================= */}
-      {/* MAP                            */}
+      {/* MAP                           */}
       {/* ============================= */}
 
       <MapContainerWithProps
@@ -242,7 +233,7 @@ export default function OperationalMap({
         />
 
         {/* ============================= */}
-        {/* REAL OSM ROADS                 */}
+        {/* REAL OSM ROADS                */}
         {/* ============================= */}
 
         {roadFeatures.length > 0 && (
@@ -295,7 +286,7 @@ export default function OperationalMap({
         )}
 
         {/* ============================= */}
-        {/* INFRASTRUCTURE ASSETS           */}
+        {/* INFRASTRUCTURE ASSETS          */}
         {/* ============================= */}
 
         {assetFeatures.map(
